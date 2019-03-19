@@ -1,13 +1,16 @@
+from urllib.parse import quote_plus
+
 from django.shortcuts import render,get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from .forms import PostForm
 from .models import Post
 # Create your views here.
 
 def post_create(request):
-    form = PostForm(request.POST or None)
+    form = PostForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.save()
@@ -20,19 +23,33 @@ def post_create(request):
     }
     return render(request, "post_form.html",context)
 
-def post_detail(request,id=None):
-    instance = get_object_or_404(Post,id=id)
+def post_detail(request,slug=None):
+    instance = get_object_or_404(Post,slug=slug)
+    share_string = quote_plus(instance.content)
     context = {
         "instance":instance,
-        "title" : "Detail"
+        "title" : "Detail",
+        "share_string":share_string,
     }
     return render(request,"post_detail.html",context)
 
 def post_list(request):
-    queryset = Post.objects.all()
+    queryset_list = Post.objects.all()
+    paginator = Paginator(queryset_list,2)
+    page_request_var = "page"
+    page = request.GET.get(page_request_var)
+    print(page)
+    try:
+        queryset = paginator.page(page)
+    except PageNotAnInteger:
+        queryset = paginator.page(1)
+    except EmptyPage:
+        queryset = paginator.page(paginator.num_pages)
+    print(queryset)
     context = {
         "object_list": queryset,
-        "title" : "List"
+        "title" : "Posts",
+        "page_request_var":page_request_var,
     }
     return render(request,"post_list.html",context)
 
@@ -44,7 +61,7 @@ def post_delete(request, id=None):
 
 def post_update(request, id=None):
     instance = get_object_or_404(Post,id=id)
-    form = PostForm(request.POST or None, instance=instance)
+    form = PostForm(request.POST or None, request.FILES or None , instance=instance)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.save()
