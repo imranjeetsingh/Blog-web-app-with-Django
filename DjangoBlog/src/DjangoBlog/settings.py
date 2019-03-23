@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'markdown_deux',
     'crispy_forms',
     'comments',
+    'accounts',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
@@ -57,6 +58,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+LOGIN_URL = "/login/"
 ROOT_URLCONF = 'DjangoBlog.urls'
 
 TEMPLATES = [
