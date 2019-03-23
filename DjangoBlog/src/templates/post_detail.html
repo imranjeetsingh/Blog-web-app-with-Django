@@ -2,6 +2,8 @@
 
 {% load urlify %}
 
+{% load crispy_forms_tags %}
+
 {% block head_title %}{{instance.title}} | {{block.super}} {% endblock head_title %}
 
 
@@ -13,13 +15,17 @@
     {% if instance.image %}
     <img src="{{instance.image.url}}" alt="" srcset="" class="img-responsive">
     {% endif %}
-    <h1>{{instance.title}} <small>{% if instance.draft %}<span style="color:red;">Draft </span>{% endif %}{{instance.publish}}</small> </h1>
+    <h1>{{instance.title}} <small>{% if instance.draft %}<span style="color:red;">Draft
+            </span>{% endif %}{{instance.publish}}</small> </h1>
+    <p>Read time : {% if instance.read_time <= 1 %} < {{instance.read_time}} minute {% else %}{{instance.read_time}} minutes {% endif %} </p>
     {% if instance.user.get_full_name %}
     <p>Author: {{instance.user.get_full_name}}</p>
     {% endif %}
-    <p><div class="fb-like" data-href="{{ request.build_absolute_uri }}" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
-        <hr/>
-        </p>
+    <p>
+        <div class="fb-like" data-href="{{ request.build_absolute_uri }}" data-layout="button_count" data-action="like"
+            data-show-faces="true" data-share="true"></div>
+        <hr />
+    </p>
     <!-- </p>
      <p><a href="https://www.facebook.com/sharer/sharer.php?u={{request.build_absolute_uri}}">
         Facebook
@@ -34,10 +40,43 @@
 </p>    -->
     <div class="row">
         <div class="col-sm-12">
-            <div class="post-detail-item">{{instance.get_markdown | truncatechars_html:120}}</div>
+            <div class="post-detail-item">{{instance.get_markdown }}</div>
+            <!-- {{instance.comments.all }} -->
             <hr />
             <br />
-            <div class="fb-comments" data-href="{{ request.build_absolute_uri }}" data-numposts="5"></div>
+            <div>
+                <p class="lead">Comments</p>
+                <form action="" method="POST">{% csrf_token %}
+                    {{comment_form | crispy }}
+                    <input type="submit" value="Post comment" class="btn btn-default">
+                </form>
+                <hr />
+                {% for comments in comments %}
+                <!-- {{ comments.content_object }} -->
+                <blockquote>
+                    <p> {{comments.content}}</p>
+                    <footer>via {{ comments.user }} | {{ comments.timestamp|timesince }} ago |
+                        {% if comments.children.count > 0 %}{{ comments.children.count }}
+                        Comment{% if comments.children.count > 1 %}s{% endif %} | {% endif %} <a
+                            class='comment-reply-btn' href='#'>Reply</a> <a href="{{comments.get_absolute_url}}">threads</a> </footer>
+                    <hr>
+                    <div class="comment-reply" style="display:none;">
+                        {% for child_comment in comments.children %}
+                        <blockquote>
+                            <p class="mb-0"> {{child_comment.content}}</p>
+                            <footer>via {{child_comment.user }} | {{ child_comment.timestamp | timesince }} </footer>
+                        </blockquote>
+                        {% endfor %}
+                        <form action="" method="POST">{% csrf_token %}
+                            {{comment_form | crispy }}
+                            <input type="hidden" name='parent_id' value="{{comments.id}}">
+                            <input type="submit" value="Reply" class="btn btn-default">
+                        </form>
+                    </div>
+                </blockquote>
+                <hr />
+                {% endfor %}
+            </div>
         </div>
     </div>
 

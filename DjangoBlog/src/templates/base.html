@@ -13,13 +13,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href='{% static "css/base.css" %}' />
     <style>
-        {
-            % block style %
-        }
-
-            {
-            % endblock style %
-        }
+        {% block style %}{% endblock style %}
     </style>
     {% block head_extra %} {% endblock head_extra %}
 </head>
@@ -58,6 +52,42 @@
                 $(".post-detail-item img").each(function(){
                     $(this).addClass("img-responsive")
                 })
+                var titleItem = $("#id_title")
+                $("#preview-title").text(titleItem.val())
+
+                var contentInput = $("#id_content")
+                
+                function setContent(value){
+                    var markedContent = marked(value)
+                    $("#preview-content").html(markedContent)
+                    $("#preview-content img").each(function(){
+                        $(this).addClass("img-responsive")
+                    })
+                }
+
+                setContent(contentInput.val())
+
+                contentInput.keyup(function(){
+                    var newContent = $(this).val()
+                    setContent(newContent)
+                })
+
+                var titleInput = $("#id_title")
+
+                function setTitle(value){
+                    $("#preview-title").text(value)
+                }
+                setTitle(titleInput.val())
+
+                titleInput.keyup(function(){
+                    var newTitle = $(this).val()
+                    setTitle(newTitle)
+                })
+                $(".comment-reply-btn").click(function(event){
+                    event.preventDefault();
+                    $(this).parent().next().next(".comment-reply").fadeToggle();
+                })
+
             })
         </script>
 

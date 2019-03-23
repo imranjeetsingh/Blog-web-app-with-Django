@@ -3,12 +3,17 @@
 {% block content %}
 <div class="col-sm-6 col-sm-offset-3">
     <h1>{{title}}</h1>
-<form action="" method="GET">
-    <input type="text" name="q" value="{{request.GET.q}}" placeholder="Search Posts">
-    <input type="submit" value="Search">
+<form action="" method="GET" class="row">
+    <div class="col-sm-6">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" value="{{request.GET.q}}" placeholder="Search Posts">
+            <span class="input-group-btn">
+            <input type="submit" class="btn btn-default" value="Search">
+            </span>
+        </div>
+    </div>
 </form>
 <br>
-</form>
 {% for obj in object_list %}
 <div class="row">
     <div class="col-sm-12">
