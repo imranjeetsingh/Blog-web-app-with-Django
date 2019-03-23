@@ -8,7 +8,7 @@
 
 
 {% block content %}
-{{object}}
+<!-- {{object}} -->
 <!-- {{instance.title|urlify}} -->
 
 <div class="col-sm-6 col-sm-offset-3">
@@ -16,13 +16,13 @@
     <p> {{comments.content}}</p>
     <footer>via {{ comments.user }} | {{ comments.timestamp|timesince }} ago |
         {% if comments.children.count > 0 %}{{ comments.children.count }}
-        Comment{% if comments.children.count > 1 %}s{% endif %} | {% endif %} </footer>
+        Comment{% if comments.children.count > 1 %}s{% endif %} {% endif %} {% if request.user == comments.user %} <a href="{{comments.get_delete_url}}">Delete</a>{% endif %} </footer>
     <hr>
     <div>
         {% for child_comment in comments.children %}
         <blockquote>
             <p class="mb-0"> {{child_comment.content}}</p>
-            <footer>via {{child_comment.user }} | {{ child_comment.timestamp | timesince }} </footer>
+            <footer>via {{child_comment.user }} | {{ child_comment.timestamp | timesince }} ago  {% if request.user == child_comment.user %} <a href="{{child_comment.get_delete_url}}">Delete</a> {% endif %}  </footer>
         </blockquote>
         {% endfor %}
         <form action="" method="POST">{% csrf_token %}
