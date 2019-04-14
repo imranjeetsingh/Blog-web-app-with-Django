@@ -6,6 +6,7 @@ from rest_framework.serializers import (
 from comments.api.serializers import CommentSerializer
 from comments.models import Comment
 
+from accounts.api.serializers import UserDetailSerializer
 from posts.models import Post
 
 class PostCreateUpdateSerializer(ModelSerializer):
@@ -24,7 +25,7 @@ class PostListSerializer(ModelSerializer):
         view_name='posts-api:detail',
         lookup_field='slug'
         )
-    user = SerializerMethodField()
+    user = UserDetailSerializer(read_only=True)
     class Meta:
         model = Post
         fields = [
@@ -35,11 +36,11 @@ class PostListSerializer(ModelSerializer):
             'content',
             'publish'
         ]
-    def get_user(self, obj):
-        return str(obj.user.username)
+    # def get_user(self, obj):
+    #     return str(obj.user.username)
 
 class PostDetailSerializer(ModelSerializer):
-    user = SerializerMethodField()
+    user = UserDetailSerializer(read_only=True)
     image = SerializerMethodField()
     html = SerializerMethodField()
     comments = SerializerMethodField()
@@ -56,8 +57,8 @@ class PostDetailSerializer(ModelSerializer):
             'image',
             'comments',
         ]
-    def get_user(self, obj):
-        return str(obj.user.username)
+    # def get_user(self, obj):
+    #     return str(obj.user.username)
 
     def get_image(self, obj):
         try:
